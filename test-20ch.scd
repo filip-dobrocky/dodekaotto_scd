@@ -21,8 +21,9 @@ s.quit;
 ~decoderVST    = "SimpleDecoder.vst3"; // IEM playback decoder (AllRADecoder.vst3 also works)
 ~decoderPreset = ~dir +/+ "decoders" +/+ "dodekaotto.vstpreset";     // saved plugin state
 
-s.options.numOutputBusChannels = ~nSpeakers;
+s.options.numOutputBusChannels = 24;
 s.options.memSize     = 2.pow(18);
+s.options.device = "ASIO : MOTU Pro Audio";
 s.options.numWireBufs = 1024;
 
 // ---- boot --------------------------------------------------------------------
@@ -106,14 +107,16 @@ s.waitForBoot({
 // ---- speaker check: direct bursts, one channel at a time (no ambisonics) -----
 // Walks outputs 0..19 with a short pink-noise burst on each — verifies routing
 // and that every speaker is alive before testing the ambisonic decode.
+(
 ~speakerCheck = Pbind(
 	\instrument, \pinkBurst,
-	\out,  Pseq((0 .. 19), 1),   // one pass; use inf to loop
-	\dur,  0.5,
-	\atk,  0.005,
-	\rel,  0.35,
-	\amp,  0.3,
+	\out,  Pseq((0 .. 15), inf),   // one pass; use inf to loop
+	\dur,  0.1,
+	\atk,  0.01,
+	\rel,  0.05,
+	\amp,  0.1,
 ).play;
+)
 
 // loop it (handy while walking the room)
 ~speakerCheck = Pbind(
